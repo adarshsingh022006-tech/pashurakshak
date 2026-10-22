@@ -223,76 +223,86 @@ export default function ReportAnimalHealth() {
                 </div>
               </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-start justify-between gap-3 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-800">
-                    <Sparkles size={22} />
+          ) : (() => {
+            const assessment = aiResult.aiAssessment || aiResult.risk_assessment || {
+              riskLevel: aiResult.report?.risk_level || 'High',
+              confidence: aiResult.report?.ai_confidence || 0.94,
+              reason: aiResult.report?.ai_reason,
+              contributingFactors: aiResult.report?.contributing_factors || []
+            };
+            const factors = assessment.contributingFactors || assessment.contributing_factors || [];
+
+            return (
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-800">
+                      <Sparkles size={22} />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                        AI Risk Classification Output
+                      </span>
+                      <h3 className="text-lg font-black text-slate-900">
+                        {aiResult.report?.report_number} Successfully Registered
+                      </h3>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      AI Risk Classification Output
-                    </span>
-                    <h3 className="text-lg font-black text-slate-900">
-                      {aiResult.report?.report_number} Successfully Registered
-                    </h3>
+
+                  {/* Risk Level Badge */}
+                  <div
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${
+                      assessment.riskLevel === 'High'
+                        ? 'bg-red-100 text-red-800 border border-red-300'
+                        : assessment.riskLevel === 'Medium'
+                        ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                        : 'bg-green-100 text-green-800 border border-green-300'
+                    }`}
+                  >
+                    {assessment.riskLevel} Risk (
+                    {Math.round((assessment.confidence || 0.85) * 100)}% Confidence)
                   </div>
                 </div>
 
-                {/* Risk Level Badge */}
-                <div
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${
-                    aiResult.aiAssessment?.riskLevel === 'High'
-                      ? 'bg-red-100 text-red-800 border border-red-300'
-                      : aiResult.aiAssessment?.riskLevel === 'Medium'
-                      ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                      : 'bg-green-100 text-green-800 border border-green-300'
-                  }`}
-                >
-                  {aiResult.aiAssessment?.riskLevel} Risk (
-                  {Math.round((aiResult.aiAssessment?.confidence || 0.85) * 100)}% Confidence)
-                </div>
-              </div>
-
-              {/* Clinical AI Reason */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-800 space-y-2">
-                <div className="font-bold text-navy flex items-center gap-1.5">
-                  <Info size={15} />
-                  <span>Clinical Assessment & Reason:</span>
-                </div>
-                <p className="text-slate-700 leading-relaxed font-medium">
-                  {aiResult.aiAssessment?.reason}
-                </p>
-
-                {aiResult.aiAssessment?.contributingFactors?.length > 0 && (
-                  <div className="pt-2 border-t border-slate-200">
-                    <span className="text-xs font-semibold text-slate-500">Key Risk Drivers:</span>
-                    <ul className="list-disc list-inside mt-1 space-y-0.5 text-xs text-slate-600">
-                      {aiResult.aiAssessment.contributingFactors.map((f, i) => (
-                        <li key={i}>{f}</li>
-                      ))}
-                    </ul>
+                {/* Clinical AI Reason */}
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-800 space-y-2">
+                  <div className="font-bold text-navy flex items-center gap-1.5">
+                    <Info size={15} />
+                    <span>Clinical Assessment & Reason:</span>
                   </div>
-                )}
-              </div>
+                  <p className="text-slate-700 leading-relaxed font-medium">
+                    {assessment.reason}
+                  </p>
 
-              {/* Tag notice */}
-              <div className="flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md">
-                  <CheckCircle2 size={13} /> AI-assisted, awaiting veterinarian verification
-                </span>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/case/${aiResult.report?.id}`)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-navy text-white font-semibold hover:bg-navy-dark transition-colors"
-                >
-                  <span>View Case Detail</span>
-                  <ArrowRight size={14} />
-                </button>
+                  {factors.length > 0 && (
+                    <div className="pt-2 border-t border-slate-200">
+                      <span className="text-xs font-semibold text-slate-500">Key Risk Drivers:</span>
+                      <ul className="list-disc list-inside mt-1 space-y-0.5 text-xs text-slate-600">
+                        {factors.map((f, i) => (
+                          <li key={i}>{f}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tag notice */}
+                <div className="flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md">
+                    <CheckCircle2 size={13} /> AI-assisted, awaiting veterinarian verification
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/case/${aiResult.report?.id}`)}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-navy text-white font-semibold hover:bg-navy-dark transition-colors"
+                  >
+                    <span>View Case Detail</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       )}
 

@@ -99,6 +99,8 @@ export default function LeafletMap({
           const totalReports = spot.total_reports || spot.totalReports || 28;
           const highRiskCount = spot.high_risk_reports || spot.highRiskCount || 7;
 
+          if (!lat || !lng) return null;
+
           return (
             <Circle
               key={`hotspot-${spot.id || idx}`}

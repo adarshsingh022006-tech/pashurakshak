@@ -19,7 +19,8 @@ export default function VetScheduleVisits() {
   useEffect(() => {
     api.get('/reports?status=Visit Scheduled')
       .then(res => {
-        setReportsWithVisits(res.data.reports || []);
+        const list = (res.data.reports || []).filter(r => r.status === 'Visit Scheduled');
+        setReportsWithVisits(list);
       })
       .catch(console.warn)
       .finally(() => setLoading(false));

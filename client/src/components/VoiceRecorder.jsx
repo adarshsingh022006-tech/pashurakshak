@@ -9,6 +9,7 @@ export default function VoiceRecorder({ onSymptomsDetected, onNotesAppended, cur
   const [isProcessing, setIsProcessing] = useState(false);
   const [voiceLang, setVoiceLang] = useState('hi-IN'); // default to Hindi/English for Indian farmers
   const recognitionRef = useRef(null);
+  const transcriptRef = useRef('');
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -31,6 +32,7 @@ export default function VoiceRecorder({ onSymptomsDetected, onNotesAppended, cur
         currentTranscript += event.results[i][0].transcript;
       }
       setTranscript(currentTranscript);
+      transcriptRef.current = currentTranscript;
     };
 
     recognition.onerror = (event) => {
@@ -40,6 +42,9 @@ export default function VoiceRecorder({ onSymptomsDetected, onNotesAppended, cur
 
     recognition.onend = () => {
       setIsListening(false);
+      if (transcriptRef.current && transcriptRef.current.trim().length > 0) {
+        handleParseTranscript(transcriptRef.current);
+      }
     };
 
     recognitionRef.current = recognition;
@@ -49,7 +54,7 @@ export default function VoiceRecorder({ onSymptomsDetected, onNotesAppended, cur
         recognitionRef.current.abort();
       }
     };
-  }, []);
+  }, [voiceLang]);
 
   const toggleListening = () => {
     if (!recognitionRef.current) return;

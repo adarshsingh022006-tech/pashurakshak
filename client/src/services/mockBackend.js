@@ -278,8 +278,8 @@ function generateInitialReports() {
 
 // Initial Notifications
 const INITIAL_NOTIFICATIONS = [
-  { id: 1, title: '🚨 High-Risk Case Alert: COW (Case #0036)', message: 'High-risk case reported at Samrala requiring priority veterinary action.', is_read: false, created_at: new Date(Date.now() - 3600 * 1000 * 4).toISOString() },
-  { id: 2, title: '⚡ Possible Outbreak Hotspot Warning', message: 'Surveillance alert: 28 reports (7 high-risk) detected within 5 km radius in Samrala / Ludhiana East.', is_read: false, created_at: new Date(Date.now() - 3600 * 1000 * 8).toISOString() }
+  { id: 1, report_id: 1, title: '🚨 High-Risk Case Alert: COW (Case #0036)', message: 'High-risk case reported at Samrala requiring priority veterinary action.', is_read: false, created_at: new Date(Date.now() - 3600 * 1000 * 4).toISOString() },
+  { id: 2, report_id: 1, title: '⚡ Possible Outbreak Hotspot Warning', message: 'Surveillance alert: 28 reports (7 high-risk) detected within 5 km radius in Samrala / Ludhiana East.', is_read: false, created_at: new Date(Date.now() - 3600 * 1000 * 8).toISOString() }
 ];
 
 // Load or Initialize Cloud State
@@ -464,7 +464,20 @@ export async function handleMockRequest(config) {
     return { data: { user } };
   }
 
-  // 4. Animals: GET
+  // 4. Animals: GET single by ID
+  if (url.match(/\/animals\/(\d+)/) && method === 'get') {
+    const match = url.match(/\/animals\/(\d+)/);
+    const animalId = parseInt(match[1]);
+    const animal = state.animals.find(a => a.id === animalId) || state.animals[0];
+    const matchingReports = state.reports.filter(r =>
+      r.animal_id === animal.id ||
+      r.animal_tag === animal.name_or_tag ||
+      (r.species === animal.species && animal.id === 1)
+    );
+    return { data: { animal, reports: matchingReports } };
+  }
+
+  // 4b. Animals: GET all
   if (url.includes('/animals') && method === 'get') {
     return { data: { animals: state.animals } };
   }
@@ -486,11 +499,17 @@ export async function handleMockRequest(config) {
     return { data: { animal: newAnimal } };
   }
 
-  // 6. Reports: GET by ID
-  if (url.match(/\/reports\/(\d+)/) && method === 'get') {
-    const match = url.match(/\/reports\/(\d+)/);
-    const reportId = parseInt(match[1]);
-    const report = state.reports.find(r => r.id === reportId) || state.reports[0];
+  // 6. Reports: GET by ID (flexible matching)
+  if (url.match(/\/reports\/([^\/?]+)/) && method === 'get' && !url.includes('/status')) {
+    const match = url.match(/\/reports\/([^\/?]+)/);
+    const idParam = decodeURIComponent(match[1]);
+    const parsedNum = parseInt(idParam);
+    const report = state.reports.find(r =>
+      r.id === parsedNum ||
+      r.report_number === idParam ||
+      r.report_number.toLowerCase() === idParam.toLowerCase() ||
+      r.report_number.endsWith(String(parsedNum).padStart(4, '0'))
+    ) || state.reports[0];
     const visits = state.visits.filter(v => v.report_id === report.id);
     const treatments = state.treatments.filter(t => t.report_id === report.id);
     return { data: { report, visits, treatments } };
@@ -564,9 +583,22 @@ export async function handleMockRequest(config) {
     }
   }
 
-  // 11. Reports: GET List
+  // 11. Reports: GET List (with query filtering for status, species, risk)
   if (url.includes('/reports') && method === 'get') {
-    return { data: { reports: state.reports } };
+    let reports = [...state.reports];
+    if (url.includes('status=')) {
+      const statusParam = decodeURIComponent(url.split('status=')[1].split('&')[0]);
+      reports = reports.filter(r => r.status.toLowerCase() === statusParam.toLowerCase());
+    }
+    if (url.includes('risk_level=')) {
+      const riskParam = decodeURIComponent(url.split('risk_level=')[1].split('&')[0]);
+      reports = reports.filter(r => r.risk_level.toLowerCase() === riskParam.toLowerCase());
+    }
+    if (url.includes('species=')) {
+      const specParam = decodeURIComponent(url.split('species=')[1].split('&')[0]);
+      reports = reports.filter(r => r.species.toLowerCase() === specParam.toLowerCase());
+    }
+    return { data: { reports } };
   }
 
   // 12. Reports: POST Create
@@ -619,7 +651,13 @@ export async function handleMockRequest(config) {
     }
 
     saveState(state);
-    return { data: { report: newReport, risk_assessment: riskAssessment } };
+    return {
+      data: {
+        report: newReport,
+        aiAssessment: riskAssessment,
+        risk_assessment: riskAssessment
+      }
+    };
   }
 
   // 13. Mortality: POST

@@ -36,6 +36,18 @@ export default function AuthorityDashboard() {
   const [hotspots, setHotspots] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const fallbackDiseases = [
+    { disease: 'Ranikhet Disease', deaths: 27420, color: '#1F3A8A' },
+    { disease: 'Infectious Bursal (IBD)', deaths: 24428, color: '#3B5BA5' },
+    { disease: 'PPR (Goat Plague)', deaths: 3510, color: '#D97706' },
+    { disease: 'African Swine Fever', deaths: 2840, color: '#DC2626' },
+    { disease: 'Fowl Pox', deaths: 1230, color: '#7CB342' }
+  ];
+
+  const chartDiseases = officialData?.diseases && officialData.diseases.length > 0
+    ? officialData.diseases
+    : fallbackDiseases;
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -231,13 +243,7 @@ export default function AuthorityDashboard() {
         <div className="h-80 w-full pt-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={officialData?.diseases || [
-                { disease: 'Ranikhet Disease', deaths: 27420, color: '#1F3A8A' },
-                { disease: 'Infectious Bursal (IBD)', deaths: 24428, color: '#3B5BA5' },
-                { disease: 'PPR (Goat Plague)', deaths: 3510, color: '#D97706' },
-                { disease: 'African Swine Fever', deaths: 2840, color: '#DC2626' },
-                { disease: 'Fowl Pox', deaths: 1230, color: '#7CB342' }
-              ]}
+              data={chartDiseases}
               margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -253,7 +259,7 @@ export default function AuthorityDashboard() {
                 }}
               />
               <Bar dataKey="deaths" radius={[8, 8, 0, 0]}>
-                {(officialData?.diseases || []).map((entry, index) => (
+                {chartDiseases.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color || '#3B5BA5'} />
                 ))}
               </Bar>
