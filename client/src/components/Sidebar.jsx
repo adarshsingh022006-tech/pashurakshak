@@ -128,11 +128,11 @@ export default function Sidebar({ isOpen, onClose }) {
             </nav>
           </div>
 
-          {/* Veterinarian Specific Links */}
-          {(role === 'vet' || role === 'authority') && (
+          {/* Veterinarian Specific Links (Available for quick doctor triage inspection) */}
+          {(role === 'vet' || role === 'authority' || role === 'farmer' || !role) && (
             <div>
               <div className="px-3 mb-2 text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-                VETERINARY ACTIONS
+                DOCTOR & VET ACTIONS
               </div>
               <nav className="space-y-1">
                 <NavLink to="/vet/priority" className={navItemClass} onClick={onClose}>

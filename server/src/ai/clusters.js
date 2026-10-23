@@ -122,9 +122,9 @@ function detectClusters(reports, epsKm = 5.0, minPts = 3) {
  */
 async function updateHotspots(db) {
   try {
-    // Get reports from the last 14 days
+    // Get reports from the last 3 days (focused active surveillance window)
     const recentReports = await db('health_reports')
-      .where('created_at', '>=', db.raw("datetime('now', '-14 days')"))
+      .where('created_at', '>=', db.raw("datetime('now', '-3 days')"))
       .orWhereNotNull('latitude')
       .select('*');
 
@@ -172,9 +172,9 @@ async function updateHotspots(db) {
 }
 
 /**
- * Count nearby reports within radiusKm of a point in the last N days
+ * Count nearby reports within radiusKm of a point in the last N days (default 3 days)
  */
-async function getNearbyReportCount(db, lat, lng, radiusKm = 5.0, days = 7) {
+async function getNearbyReportCount(db, lat, lng, radiusKm = 5.0, days = 3) {
   try {
     const reports = await db('health_reports')
       .where('created_at', '>=', db.raw(`datetime('now', '-${days} days')`))

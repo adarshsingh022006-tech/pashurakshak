@@ -16,6 +16,7 @@ export default function VetPriorityQueue() {
   const navigate = useNavigate();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [timeFilter, setTimeFilter] = useState('3days'); // 3-day window
 
   useEffect(() => {
     api.get('/reports?limit=60')
@@ -35,8 +36,16 @@ export default function VetPriorityQueue() {
       .finally(() => setLoading(false));
   }, []);
 
-  const highRiskUnverified = reports.filter(r => r.risk_level === 'High' && !r.is_verified);
-  const highRiskTotal = reports.filter(r => r.risk_level === 'High');
+  const activeReports = reports.filter(r => {
+    if (timeFilter === '3days') {
+      const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000;
+      return new Date(r.created_at).getTime() >= threeDaysAgo;
+    }
+    return true;
+  });
+
+  const highRiskUnverified = activeReports.filter(r => r.risk_level === 'High' && !r.is_verified);
+  const highRiskTotal = activeReports.filter(r => r.risk_level === 'High');
 
   return (
     <div className="space-y-6">
@@ -56,12 +65,22 @@ export default function VetPriorityQueue() {
           </p>
         </div>
 
-        <Link
-          to="/vet/cases"
-          className="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-xs font-semibold text-slate-700 self-start"
-        >
-          Manage All Cases &rarr;
-        </Link>
+        <div className="flex items-center gap-2 self-start flex-wrap">
+          <select
+            value={timeFilter}
+            onChange={(e) => setTimeFilter(e.target.value)}
+            className="px-3 py-1.5 rounded-xl border border-emerald-400 bg-emerald-50 text-emerald-950 text-xs font-semibold"
+          >
+            <option value="3days">⏱️ Last 3 Days</option>
+            <option value="all">📅 All Time</option>
+          </select>
+          <Link
+            to="/vet/cases"
+            className="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-xs font-semibold text-slate-700"
+          >
+            Manage All Cases &rarr;
+          </Link>
+        </div>
       </div>
 
       {/* High-Risk Action Banner */}
@@ -86,10 +105,10 @@ export default function VetPriorityQueue() {
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-            Triage Order: High Risk &rarr; Medium Risk &rarr; Low Risk
+            Triage Order: High Risk &rarr; Medium Risk &rarr; Low Risk ({timeFilter === '3days' ? '3-Day Active Window' : 'All'})
           </span>
           <span className="text-xs text-slate-500 font-medium">
-            Total in queue: {reports.length}
+            Total in queue: {activeReports.length}
           </span>
         </div>
 
@@ -107,7 +126,7 @@ export default function VetPriorityQueue() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {reports.map((report) => {
+              {activeReports.map((report) => {
                 let symptoms = [];
                 try {
                   symptoms = typeof report.symptoms === 'string' ? JSON.parse(report.symptoms) : (report.symptoms || []);

@@ -138,26 +138,29 @@ export default function ReportAnimalHealth() {
 
     const payload = {
       animal_id: selectedAnimalId ? parseInt(selectedAnimalId) : null,
-      species,
+      species: species || 'cow',
       age: parseFloat(age) || 2.0,
       symptoms: selectedSymptoms,
       duration_days: parseInt(durationDays) || 1,
-      vaccination_status: vaccinationStatus,
-      free_text_notes: freeTextNotes,
-      photo_url: photoPreview,
+      vaccination_status: vaccinationStatus || 'Vaccinated',
+      free_text_notes: freeTextNotes || '',
+      photo_url: photoPreview || null,
       latitude: parseFloat(latitude) || 30.9012,
       longitude: parseFloat(longitude) || 75.8575,
-      village,
-      district
+      village: village || 'Samrala',
+      district: district || 'Ludhiana'
     };
 
-    // If offline, queue to IndexedDB immediately
+    // If offline, queue to IndexedDB immediately and navigate to Doctor queue
     if (!navigator.onLine || !isOnline) {
       try {
         await queueReportOffline(payload);
-        setAiResult({
-          offline: true,
-          message: 'Saved in offline queue. This report will automatically sync with the server once your connection is restored.'
+        navigate('/vet/cases', {
+          state: {
+            justSubmitted: true,
+            offline: true,
+            message: 'Report saved in offline queue and added to local doctor queue!'
+          }
         });
       } catch (err) {
         setError('Failed to queue report offline: ' + err.message);
@@ -169,15 +172,33 @@ export default function ReportAnimalHealth() {
 
     try {
       const res = await api.post('/reports', payload);
-      setAiResult(res.data);
+      const createdReport = res.data?.report;
+      const risk = res.data?.aiAssessment?.riskLevel || createdReport?.risk_level || 'High';
+
+      // Instantly route to Doctor's Case List
+      navigate('/vet/cases', {
+        state: {
+          newReport: createdReport,
+          justSubmitted: true,
+          reportNumber: createdReport?.report_number,
+          riskLevel: risk,
+          message: `Case ${createdReport?.report_number || ''} submitted successfully and prioritized in Doctor Triage List!`
+        }
+      });
     } catch (err) {
       console.warn('Network submit failed, saving offline fallback:', err);
-      // Fallback offline queue
-      await queueReportOffline(payload);
-      setAiResult({
-        offline: true,
-        message: 'Network error detected. Report has been queued offline and marked "Pending sync".'
-      });
+      try {
+        await queueReportOffline(payload);
+        navigate('/vet/cases', {
+          state: {
+            justSubmitted: true,
+            offline: true,
+            message: 'Report queued offline and listed in local doctor queue!'
+          }
+        });
+      } catch (queueErr) {
+        setError('Failed to submit report: ' + (err.response?.data?.error || err.message));
+      }
     } finally {
       setSubmitting(false);
     }

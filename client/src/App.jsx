@@ -123,7 +123,7 @@ export default function App() {
                 <Route
                   path="/vet/priority"
                   element={
-                    <ProtectedRoute allowedRoles={['vet', 'authority']}>
+                    <ProtectedRoute allowedRoles={['vet', 'authority', 'farmer']}>
                       <VetPriorityQueue />
                     </ProtectedRoute>
                   }
@@ -131,7 +131,7 @@ export default function App() {
                 <Route
                   path="/vet/cases"
                   element={
-                    <ProtectedRoute allowedRoles={['vet', 'authority']}>
+                    <ProtectedRoute allowedRoles={['vet', 'authority', 'farmer']}>
                       <VetManageCases />
                     </ProtectedRoute>
                   }
@@ -139,7 +139,7 @@ export default function App() {
                 <Route
                   path="/vet/visits"
                   element={
-                    <ProtectedRoute allowedRoles={['vet', 'authority']}>
+                    <ProtectedRoute allowedRoles={['vet', 'authority', 'farmer']}>
                       <VetScheduleVisits />
                     </ProtectedRoute>
                   }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   Stethoscope,
   Filter,
@@ -7,16 +7,21 @@ import {
   Calendar,
   AlertTriangle,
   ChevronRight,
-  RefreshCw
+  RefreshCw,
+  Sparkles,
+  CheckCircle2,
+  Clock
 } from 'lucide-react';
 import api from '../services/api';
 
 export default function VetManageCases() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters
+  // Filters (Defaulting to 3 days surveillance window as requested)
+  const [timeFilter, setTimeFilter] = useState('3days');
   const [speciesFilter, setSpeciesFilter] = useState('all');
   const [riskFilter, setRiskFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -26,7 +31,14 @@ export default function VetManageCases() {
     try {
       setLoading(true);
       const res = await api.get('/reports?limit=100');
-      setReports(res.data.reports || []);
+      let list = res.data.reports || [];
+      if (location.state?.newReport) {
+        const exists = list.some(r => r.id === location.state.newReport.id || r.report_number === location.state.newReport.report_number);
+        if (!exists) {
+          list = [location.state.newReport, ...list];
+        }
+      }
+      setReports(list);
     } catch (e) {
       console.warn(e);
     } finally {
@@ -39,6 +51,13 @@ export default function VetManageCases() {
   }, []);
 
   const filtered = reports.filter((r) => {
+    if (timeFilter === '3days') {
+      const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000;
+      const reportTime = new Date(r.created_at).getTime();
+      if (reportTime < threeDaysAgo && (!location.state?.newReport || r.id !== location.state.newReport.id)) {
+        return false;
+      }
+    }
     if (speciesFilter !== 'all' && r.species?.toLowerCase() !== speciesFilter) return false;
     if (riskFilter !== 'all' && r.risk_level !== riskFilter) return false;
     if (statusFilter !== 'all' && r.status !== statusFilter) return false;
@@ -54,13 +73,48 @@ export default function VetManageCases() {
 
   return (
     <div className="space-y-6">
+      {/* Newly submitted report alert banner */}
+      {location.state?.justSubmitted && (
+        <div className="bg-emerald-50 border-2 border-emerald-500 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-800 shrink-0">
+              <Sparkles size={22} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-black text-emerald-950">
+                  {location.state?.reportNumber ? `${location.state.reportNumber} Registered!` : 'New Case Registered!'}
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200 text-emerald-950 uppercase">
+                  {location.state?.riskLevel || 'High'} Risk
+                </span>
+              </div>
+              <p className="text-xs text-emerald-800 mt-0.5 font-medium">
+                {location.state?.message || 'Report automatically routed to the Doctor Triage Queue.'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => window.history.replaceState({}, document.title)}
+            className="text-emerald-700 hover:text-emerald-900 text-xs font-semibold px-2 py-1 rounded-lg hover:bg-emerald-100"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-navy-dark">
-            Manage Veterinary Cases
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-black text-navy-dark">
+              Manage Veterinary Cases
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
+              {filtered.length} Cases {timeFilter === '3days' ? '(3-Day Window)' : ''}
+            </span>
+          </div>
           <p className="text-sm text-slate-600 mt-1">
-            Clinical management workspace for case tracking, status transitions, and treatment monitoring.
+            Clinical management workspace for case tracking, status transitions, and doctor treatment monitoring.
           </p>
         </div>
 
@@ -90,6 +144,16 @@ export default function VetManageCases() {
 
           {/* Dropdown Filters */}
           <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto text-xs">
+            {/* Time Window (3 Days vs All) */}
+            <select
+              value={timeFilter}
+              onChange={(e) => setTimeFilter(e.target.value)}
+              className="px-2.5 py-2 rounded-xl border border-emerald-400 bg-emerald-50 text-emerald-950 font-semibold"
+            >
+              <option value="3days">⏱️ Last 3 Days (Active)</option>
+              <option value="all">📅 All Time Records</option>
+            </select>
+
             {/* Status */}
             <select
               value={statusFilter}

@@ -15,8 +15,8 @@ const createReportSchema = z.object({
   symptoms: z.array(z.string()).min(1, 'Please select at least one symptom'),
   duration_days: z.number().min(1).default(1),
   vaccination_status: z.string().default('Vaccinated'),
-  free_text_notes: z.string().optional(),
-  photo_url: z.string().optional(),
+  free_text_notes: z.string().nullable().optional(),
+  photo_url: z.string().nullable().optional(),
   latitude: z.number().default(30.9010),
   longitude: z.number().default(75.8572),
   village: z.string().optional().default('Samrala'),
@@ -31,8 +31,8 @@ router.post('/', authenticateToken, async (req, res) => {
     // 1. Fetch real or realistic environmental weather snapshot
     const weather = await getWeather(data.latitude, data.longitude);
 
-    // 2. Fetch spatial cluster context (nearby cases in last 7 days)
-    const { count: nearbyCases } = await getNearbyReportCount(db, data.latitude, data.longitude, 5.0, 7);
+    // 2. Fetch spatial cluster context (nearby cases in last 3 days)
+    const { count: nearbyCases } = await getNearbyReportCount(db, data.latitude, data.longitude, 5.0, 3);
 
     // 3. Count recent herd mortality in this village/district
     const mortalityRecord = await db('mortality_reports')
@@ -128,7 +128,7 @@ router.post('/', authenticateToken, async (req, res) => {
 // GET /api/reports
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const { species, risk_level, status, search, limit = 100 } = req.query;
+    const { species, risk_level, status, search, days, limit = 100 } = req.query;
 
     let query = db('health_reports')
       .leftJoin('users', 'health_reports.user_id', 'users.id')
@@ -141,6 +141,12 @@ router.get('/', authenticateToken, async (req, res) => {
       )
       .orderBy('health_reports.created_at', 'desc')
       .limit(parseInt(limit));
+
+    // Optional 3-day window filter
+    if (days) {
+      const daysCount = parseInt(days) || 3;
+      query = query.where('health_reports.created_at', '>=', db.raw(`datetime('now', '-${daysCount} days')`));
+    }
 
     // If farmer, optionally show only their own reports if requested,
     // but allow viewing all community cases if surveillance mode is on

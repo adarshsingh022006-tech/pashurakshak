@@ -583,9 +583,14 @@ export async function handleMockRequest(config) {
     }
   }
 
-  // 11. Reports: GET List (with query filtering for status, species, risk)
+  // 11. Reports: GET List (with query filtering for status, species, risk, days)
   if (url.includes('/reports') && method === 'get') {
     let reports = [...state.reports];
+    if (url.includes('days=')) {
+      const daysCount = parseInt(url.split('days=')[1].split('&')[0]) || 3;
+      const cutoff = new Date(Date.now() - daysCount * 24 * 60 * 60 * 1000);
+      reports = reports.filter(r => new Date(r.created_at) >= cutoff);
+    }
     if (url.includes('status=')) {
       const statusParam = decodeURIComponent(url.split('status=')[1].split('&')[0]);
       reports = reports.filter(r => r.status.toLowerCase() === statusParam.toLowerCase());
