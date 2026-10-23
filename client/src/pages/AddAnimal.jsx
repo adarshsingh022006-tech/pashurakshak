@@ -8,7 +8,7 @@ export default function AddAnimal() {
   const [formData, setFormData] = useState({
     name_or_tag: '',
     species: 'cow',
-    age: 2.0,
+    age: 3,
     sex: 'female',
     breed: '',
     vaccination_status: 'Vaccinated'
@@ -29,7 +29,7 @@ export default function AddAnimal() {
     try {
       await api.post('/animals', {
         ...formData,
-        age: parseFloat(formData.age) || 2.0
+        age: parseInt(formData.age) || 3
       });
       setSuccess('Animal successfully registered in herd records!');
       setTimeout(() => {
@@ -124,17 +124,25 @@ export default function AddAnimal() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold uppercase text-slate-600 mb-1">
-                Age (Years)
+                Age (Whole Years)
               </label>
               <input
                 type="number"
-                step="0.5"
-                min="0.1"
-                max="35"
+                step="1"
+                min="1"
+                max="25"
+                placeholder="e.g. 3"
                 value={formData.age}
-                onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData({
+                    ...formData,
+                    age: val === '' ? '' : Math.max(1, Math.min(25, parseInt(val) || 1))
+                  });
+                }}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
               />
+              <span className="text-[10px] text-slate-400">Enter full years (e.g. 1, 2, 3... no decimals)</span>
             </div>
 
             <div>

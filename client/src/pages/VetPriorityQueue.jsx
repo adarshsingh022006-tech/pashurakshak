@@ -165,7 +165,7 @@ export default function VetPriorityQueue() {
                     </td>
 
                     <td className="py-3.5 px-4 font-medium capitalize text-slate-800">
-                      {report.species} {report.age ? `(${report.age}y)` : ''}
+                      {report.species} {report.age ? `(${Math.round(report.age)}y)` : ''}
                       <span className="block text-[11px] text-slate-400 font-normal">
                         Tag: {report.animal_tag || 'N/A'} • {report.vaccination_status}
                       </span>

@@ -98,7 +98,7 @@ export default function HealthRecords() {
                     </span>
                   </div>
                   <div className="text-xs text-slate-500 mt-1 flex items-center justify-between">
-                    <span>Age: {a.age} yrs | {a.sex}</span>
+                    <span>Age: {Math.round(a.age || 3)} yrs | {a.sex}</span>
                     <span>{a.breed || 'Indigenous'}</span>
                   </div>
                 </div>

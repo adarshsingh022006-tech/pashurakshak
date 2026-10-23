@@ -275,7 +275,7 @@ export default function FarmerDashboard() {
                     </td>
 
                     <td className="py-3.5 px-4 font-medium text-slate-800 capitalize">
-                      {report.species} {report.age ? `(${report.age} yrs)` : ''}
+                      {report.species} {report.age ? `(${Math.round(report.age)} yrs)` : ''}
                       {report.animal_tag && (
                         <span className="block text-[11px] text-slate-400">
                           Tag: {report.animal_tag}

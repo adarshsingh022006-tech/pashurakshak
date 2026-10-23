@@ -1,7 +1,7 @@
 // Client-Side Mock Backend & Data Engine for Standalone Cloud & Offline Deployment
 // Provides persistent state in localStorage and exact clinical AI risk scoring
 
-const STORAGE_KEY = 'pashurakshak_cloud_state_v2';
+const STORAGE_KEY = 'pashurakshak_cloud_state_v5';
 
 // 10 Core livestock clinical symptoms
 export const SYMPTOMS_LIST = [
@@ -78,12 +78,12 @@ const INITIAL_USERS = {
   'govt@demo.com': { id: 3, name: 'Dr. Ravneet Kaur (State Surveillance Director)', email: 'govt@demo.com', role: 'authority', district: 'Ludhiana', state: 'Punjab', phone: '+91 98456 78901' }
 };
 
-// Initial Seed Animals
+// Initial Seed Animals (Clean Integer Ages)
 const INITIAL_ANIMALS = [
-  { id: 1, user_id: 1, name_or_tag: '0036', species: 'cow', age: 21.0, sex: 'female', breed: 'Sahiwal Indigenous', vaccination_status: 'Vaccinated' },
-  { id: 2, user_id: 1, name_or_tag: 'B-204', species: 'buffalo', age: 5.5, sex: 'female', breed: 'Murrah', vaccination_status: 'Vaccinated' },
-  { id: 3, user_id: 1, name_or_tag: 'G-102', species: 'goat', age: 3.0, sex: 'male', breed: 'Beetal', vaccination_status: 'Vaccinated' },
-  { id: 4, user_id: 1, name_or_tag: 'C-412', species: 'cow', age: 4.0, sex: 'female', breed: 'Holstein Friesian Cross', vaccination_status: 'Partially Vaccinated' }
+  { id: 1, user_id: 1, name_or_tag: '0036', species: 'cow', age: 3, sex: 'female', breed: 'Sahiwal Indigenous', vaccination_status: 'Vaccinated' },
+  { id: 2, user_id: 1, name_or_tag: 'B-204', species: 'buffalo', age: 5, sex: 'female', breed: 'Murrah', vaccination_status: 'Vaccinated' },
+  { id: 3, user_id: 1, name_or_tag: 'G-102', species: 'goat', age: 2, sex: 'male', breed: 'Beetal', vaccination_status: 'Vaccinated' },
+  { id: 4, user_id: 1, name_or_tag: 'C-412', species: 'cow', age: 4, sex: 'female', breed: 'Holstein Friesian Cross', vaccination_status: 'Partially Vaccinated' }
 ];
 
 // Initial 39 Reports (Cluster has 28 reports with 7 High Risk, Case #0036 is primary)
@@ -99,7 +99,7 @@ function generateInitialReports() {
     user_id: 1,
     animal_id: 1,
     species: 'cow',
-    age: 21.0,
+    age: 3,
     animal_tag: '0036',
     animal_breed: 'Sahiwal Indigenous',
     symptoms: ['fever', 'difficulty_walking', 'salivation'],
@@ -133,12 +133,12 @@ function generateInitialReports() {
 
   // 6 additional HIGH-RISK cases in cluster (Total High in cluster = 7)
   const highRiskTemplates = [
-    { num: 'Case #0012', species: 'buffalo', age: 6.0, sym: ['fever', 'salivation', 'swelling'], days: 3, vacc: 'Unvaccinated', notes: 'Submandibular swelling and severe salivation.' },
-    { num: 'Case #0019', species: 'cow', age: 4.5, sym: ['fever', 'difficulty_walking', 'skin_lesions'], days: 2, vacc: 'Partially Vaccinated', notes: 'Vesicular lesions observed on interdigital pouch and dental pad.' },
-    { num: 'Case #0023', species: 'cow', age: 5.0, sym: ['fever', 'coughing', 'nasal_discharge'], days: 4, vacc: 'Unvaccinated', notes: 'Rapid laboured breathing with mucoid nasal discharge.' },
-    { num: 'Case #0029', species: 'buffalo', age: 7.0, sym: ['fever', 'salivation', 'lameness'], days: 2, vacc: 'Vaccinated', notes: 'Refusing feed, excessive drooling, hind limb stiffness.' },
-    { num: 'Case #0031', species: 'goat', age: 2.0, sym: ['fever', 'diarrhea', 'nasal_discharge'], days: 3, vacc: 'Unvaccinated', notes: 'Suspected PPR syndrome; high mortality in local goat pen.' },
-    { num: 'Case #0034', species: 'cow', age: 3.5, sym: ['fever', 'difficulty_walking', 'salivation'], days: 1, vacc: 'Partially Vaccinated', notes: 'Acute shivering, foam at mouth, unable to walk to shed.' },
+    { num: 'Case #0012', species: 'buffalo', age: 6, sym: ['fever', 'salivation', 'swelling'], days: 3, vacc: 'Unvaccinated', notes: 'Submandibular swelling and severe salivation.' },
+    { num: 'Case #0019', species: 'cow', age: 4, sym: ['fever', 'difficulty_walking', 'skin_lesions'], days: 2, vacc: 'Partially Vaccinated', notes: 'Vesicular lesions observed on interdigital pouch and dental pad.' },
+    { num: 'Case #0023', species: 'cow', age: 4, sym: ['fever', 'coughing', 'nasal_discharge'], days: 4, vacc: 'Unvaccinated', notes: 'Rapid laboured breathing with mucoid nasal discharge.' },
+    { num: 'Case #0029', species: 'buffalo', age: 6, sym: ['fever', 'salivation', 'lameness'], days: 2, vacc: 'Vaccinated', notes: 'Refusing feed, excessive drooling, hind limb stiffness.' },
+    { num: 'Case #0031', species: 'goat', age: 2, sym: ['fever', 'diarrhea', 'nasal_discharge'], days: 3, vacc: 'Unvaccinated', notes: 'Suspected PPR syndrome; high mortality in local goat pen.' },
+    { num: 'Case #0034', species: 'cow', age: 3, sym: ['fever', 'difficulty_walking', 'salivation'], days: 1, vacc: 'Partially Vaccinated', notes: 'Acute shivering, foam at mouth, unable to walk to shed.' },
   ];
 
   highRiskTemplates.forEach((t, i) => {
@@ -196,7 +196,7 @@ function generateInitialReports() {
       report_number: caseNum,
       user_id: 1,
       species,
-      age: 2.0 + (i % 8),
+      age: 2 + (i % 6),
       animal_tag: `TAG-${200 + i}`,
       symptoms: sym,
       duration_days: 1 + (i % 3),
@@ -245,7 +245,7 @@ function generateInitialReports() {
       report_number: s.num,
       user_id: 1,
       species: s.sp,
-      age: 3.5,
+      age: 3,
       animal_tag: `TAG-${300 + i}`,
       symptoms: s.sym,
       duration_days: 2,
@@ -489,7 +489,7 @@ export async function handleMockRequest(config) {
       user_id: 1,
       name_or_tag: data.name_or_tag || `TAG-${Date.now() % 1000}`,
       species: data.species || 'cow',
-      age: parseFloat(data.age) || 3.0,
+      age: parseInt(data.age) || 3,
       sex: data.sex || 'female',
       breed: data.breed || 'Indigenous',
       vaccination_status: data.vaccination_status || 'Vaccinated'
@@ -617,7 +617,7 @@ export async function handleMockRequest(config) {
       report_number: reportNum,
       user_id: 1,
       species: data.species || 'cow',
-      age: parseFloat(data.age) || 3.0,
+      age: parseInt(data.age) || 3,
       animal_tag: data.animal_tag || `TAG-${Date.now() % 1000}`,
       symptoms: data.symptoms || [],
       duration_days: parseInt(data.duration_days) || 1,

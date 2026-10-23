@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 class ReportCreate(BaseModel):
     animal_id: Optional[int] = None
     species: str = "cow"
-    age: float = 2.0
+    age: int = 3
     symptoms: List[str]
     duration_days: int = 1
     vaccination_status: str = "Vaccinated"

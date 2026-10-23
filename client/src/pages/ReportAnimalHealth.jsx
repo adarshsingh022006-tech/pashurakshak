@@ -42,7 +42,7 @@ export default function ReportAnimalHealth() {
   const [animals, setAnimals] = useState([]);
   const [selectedAnimalId, setSelectedAnimalId] = useState('');
   const [species, setSpecies] = useState('cow');
-  const [age, setAge] = useState(2.0);
+  const [age, setAge] = useState(3);
   const [vaccinationStatus, setVaccinationStatus] = useState('Vaccinated');
   const [selectedSymptoms, setSelectedSymptoms] = useState(['fever']);
   const [durationDays, setDurationDays] = useState(2);
@@ -70,7 +70,7 @@ export default function ReportAnimalHealth() {
           const first = res.data.animals[0];
           setSelectedAnimalId(first.id);
           setSpecies(first.species);
-          setAge(first.age);
+          setAge(Math.round(first.age || 3));
           setVaccinationStatus(first.vaccination_status);
         }
       })
@@ -98,7 +98,7 @@ export default function ReportAnimalHealth() {
     const animal = animals.find(a => String(a.id) === String(val));
     if (animal) {
       setSpecies(animal.species);
-      setAge(animal.age);
+      setAge(Math.round(animal.age || 3));
       setVaccinationStatus(animal.vaccination_status);
     }
   };
@@ -143,7 +143,7 @@ export default function ReportAnimalHealth() {
     const payload = {
       animal_id: selectedAnimalId ? parseInt(selectedAnimalId) : null,
       species: species || 'cow',
-      age: parseFloat(age) || 2.0,
+      age: parseInt(age) || 3,
       symptoms: selectedSymptoms,
       duration_days: parseInt(durationDays) || 1,
       vaccination_status: vaccinationStatus || 'Vaccinated',
@@ -563,16 +563,23 @@ export default function ReportAnimalHealth() {
 
           <div>
             <label className="block text-xs font-bold uppercase text-slate-600 mb-1">
-              Animal Age (Years)
+              Animal Age (Whole Years)
             </label>
             <input
               type="number"
-              step="0.5"
-              min="0.1"
+              step="1"
+              min="1"
+              max="25"
+              placeholder="e.g. 3"
               value={age}
-              onChange={(e) => setAge(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === '') setAge('');
+                else setAge(Math.max(1, Math.min(25, parseInt(val) || 1)));
+              }}
               className="w-full px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium"
             />
+            <span className="text-[10px] text-slate-400">Enter full years (e.g. 1, 2, 3... no decimals)</span>
           </div>
 
           <div>

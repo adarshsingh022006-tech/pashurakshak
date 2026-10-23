@@ -62,7 +62,7 @@ def seed_db():
             user_id=farmer.id,
             name_or_tag="0036",
             species="cow",
-            age=2.5,
+            age=3,
             sex="female",
             breed="Sahiwal Indigenous",
             vaccination_status="Vaccinated"
@@ -77,7 +77,7 @@ def seed_db():
             user_id=farmer.id,
             animal_id=cow.id,
             species="cow",
-            age=2.5,
+            age=3,
             symptoms=json.dumps(["fever", "difficulty_walking", "salivation"]),
             duration_days=2,
             vaccination_status="Vaccinated",
@@ -105,12 +105,12 @@ def seed_db():
 
         # Seed 6 additional High-Risk cluster reports
         high_templates = [
-            ("Case #0012", "buffalo", 5.0, ["fever", "salivation", "swelling"], "Submandibular swelling and severe salivation."),
-            ("Case #0019", "cow", 4.0, ["fever", "difficulty_walking", "skin_lesions"], "Vesicular lesions observed on interdigital pouch."),
-            ("Case #0023", "cow", 3.5, ["fever", "coughing", "nasal_discharge"], "Rapid laboured breathing with nasal discharge."),
-            ("Case #0029", "buffalo", 6.0, ["fever", "salivation", "lameness"], "Refusing feed, excessive drooling, hind limb stiffness."),
-            ("Case #0031", "goat", 2.0, ["fever", "diarrhea", "nasal_discharge"], "Suspected PPR syndrome; high mortality in local goat pen."),
-            ("Case #0034", "cow", 3.0, ["fever", "difficulty_walking", "salivation"], "Acute shivering, foam at mouth, unable to walk to shed.")
+            ("Case #0012", "buffalo", 5, ["fever", "salivation", "swelling"], "Submandibular swelling and severe salivation."),
+            ("Case #0019", "cow", 4, ["fever", "difficulty_walking", "skin_lesions"], "Vesicular lesions observed on interdigital pouch."),
+            ("Case #0023", "cow", 3, ["fever", "coughing", "nasal_discharge"], "Rapid laboured breathing with nasal discharge."),
+            ("Case #0029", "buffalo", 6, ["fever", "salivation", "lameness"], "Refusing feed, excessive drooling, hind limb stiffness."),
+            ("Case #0031", "goat", 2, ["fever", "diarrhea", "nasal_discharge"], "Suspected PPR syndrome; high mortality in local goat pen."),
+            ("Case #0034", "cow", 3, ["fever", "difficulty_walking", "salivation"], "Acute shivering, foam at mouth, unable to walk to shed.")
         ]
 
         center_lat = 30.9010

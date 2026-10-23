@@ -67,7 +67,7 @@ export default function VetScheduleVisits() {
                       {report.report_number}
                     </h3>
                     <p className="text-xs text-slate-500 capitalize">
-                      {report.species} ({report.age} yrs)
+                      {report.species} ({Math.round(report.age || 3)} yrs)
                     </p>
                   </div>
                 </div>

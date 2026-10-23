@@ -246,7 +246,7 @@ export default function CaseDetail() {
           </div>
           <div className="text-sm font-semibold text-slate-800">
             <span className="capitalize">{report.species}</span>
-            {report.age ? `, Age ${Number(report.age).toFixed(1)} years` : ''}
+            {report.age ? `, Age ${Math.round(report.age)} years` : ''}
           </div>
           {report.animal_breed && (
             <div className="text-xs text-slate-500">

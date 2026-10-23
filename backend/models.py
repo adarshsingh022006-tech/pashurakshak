@@ -32,7 +32,7 @@ class Animal(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     name_or_tag = Column(String(100), nullable=False)
     species = Column(String(50), nullable=False)  # cow, buffalo, goat, sheep, pig, poultry
-    age = Column(Float, default=2.0)
+    age = Column(Integer, default=3)
     sex = Column(String(20), default="female")
     breed = Column(String(100), nullable=True)
     vaccination_status = Column(String(50), default="Vaccinated")
@@ -49,7 +49,7 @@ class HealthReport(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     animal_id = Column(Integer, ForeignKey("animals.id", ondelete="SET NULL"), nullable=True)
     species = Column(String(50), nullable=False)
-    age = Column(Float, default=2.0)
+    age = Column(Integer, default=3)
     symptoms = Column(Text, nullable=False)  # JSON list string
     duration_days = Column(Integer, default=1)
     vaccination_status = Column(String(50), default="Vaccinated")

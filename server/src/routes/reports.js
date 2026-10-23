@@ -11,7 +11,7 @@ const { notifyHighRiskCase } = require('../services/notificationService');
 const createReportSchema = z.object({
   animal_id: z.number().nullable().optional(),
   species: z.string().default('cow'),
-  age: z.number().optional().default(2.0),
+  age: z.number().int().min(1).max(30).default(3),
   symptoms: z.array(z.string()).min(1, 'Please select at least one symptom'),
   duration_days: z.number().min(1).default(1),
   vaccination_status: z.string().default('Vaccinated'),

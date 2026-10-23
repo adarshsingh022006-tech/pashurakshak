@@ -186,7 +186,7 @@ export default function LeafletMap({
                   <div className="space-y-1 text-slate-600">
                     <div>
                       <span className="font-medium text-slate-800">Animal: </span>
-                      <span className="capitalize">{report.species} ({report.age} yrs)</span>
+                      <span className="capitalize">{report.species} ({Math.round(report.age || 3)} yrs)</span>
                     </div>
                     <div>
                       <span className="font-medium text-slate-800">Location: </span>

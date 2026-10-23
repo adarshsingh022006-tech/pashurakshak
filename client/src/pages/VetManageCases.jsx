@@ -234,7 +234,7 @@ export default function VetManageCases() {
                     </td>
 
                     <td className="py-3.5 px-4 font-medium capitalize text-slate-800">
-                      {report.species} {report.age ? `(${report.age}y)` : ''}
+                      {report.species} {report.age ? `(${Math.round(report.age)}y)` : ''}
                     </td>
 
                     <td className="py-3.5 px-4">
