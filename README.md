@@ -10,30 +10,32 @@
 
 ---
 
-## 🛠️ Official Tech Stack (Hackathon Presentation Aligned)
+## 🛠️ Tech Stack
 
 | Component | Technology | Implementation Details |
 | :--- | :--- | :--- |
 | **Frontend** | **React.js + Tailwind CSS** | React 18, Vite 5, Tailwind CSS 3.4, Lucide Icons, Mobile-first responsive UI |
-| **Backend** | **Python + FastAPI** | Modern asynchronous Python 3.10+ FastAPI server (`backend/main.py`), Pydantic v2 schemas |
-| **Database** | **PostgreSQL** | PostgreSQL with SQLAlchemy ORM (with zero-config SQLite local fallback) |
-| **AI / ML** | **Random Forest Classifier → Risk** | Scikit-Learn `RandomForestClassifier` (100 Estimators, 19 Clinical Features) |
+| **Backend** | **Node.js + Express.js** | Express 4, RESTful JSON APIs, Knex.js query builder, Zod validation |
+| **Database** | **SQLite / PostgreSQL** | Relational database (SQLite local with Knex migrations & seeds, zero setup needed) |
+| **AI / ML** | **Random Forest Classifier → Risk** | `ml-random-forest` + Veterinary Clinical Risk Rules Engine (19 Features) |
 | **Maps & GIS** | **Leaflet + OpenStreetMap** | Leaflet 1.9, React-Leaflet, Haversine + DBSCAN (5 km radius, 3-day active surveillance) |
-| **Environmental Data** | **OpenWeatherMap** | Live micro-climate temperature & humidity risk integration with Punjab fallback |
+| **Environmental Data** | **OpenWeatherMap** | Live micro-climate temperature & humidity risk integration |
 | **Voice Processing** | **Speech-to-Text API** | Multilingual browser Web Speech API + backend symptom NLP parser (Hindi, Punjabi, English) |
+
+*(Note: An alternative Python FastAPI backend is also preserved in `backend/` for Python/Scikit-Learn environments).*
 
 ---
 
 ## 🌟 The PashuRakshak Intelligence Loop
 
 1. **CAPTURE (Grassroots Ingestion)**:
-   - Voice dictation in English, Hindi (हिन्दी), and Punjabi (ਪੰਜਾਬੀ) powered by the browser Speech-to-Text API with backend NLP keyword extraction.
+   - Voice dictation in English, Hindi (हिन्दी), and Punjabi (ਪੰਜਾਬੀ) powered by browser Speech-to-Text with backend NLP keyword extraction.
    - 10 multi-select clinical symptom chips (fever, coughing, difficulty walking, salivation, loss of appetite, diarrhea, skin lesions, nasal discharge, lameness, swelling).
    - Herd registry, ante-mortem herd mortality reporting, and GPS geolocation auto-capture.
    - Offline-first resilience via Service Worker and IndexedDB queue with automatic background sync when connectivity returns.
 
 2. **ASSESS (AI-Assisted Risk Engine)**:
-   - Python Scikit-Learn Random Forest risk classifier (`RandomForestClassifier`, 100 estimators, max depth 8) trained across 19 clinical epidemiological features.
+   - Random Forest risk classifier trained across 19 clinical epidemiological features.
    - Outputs risk category (**High**, **Medium**, **Low**), confidence metrics, and transparent, human-readable clinical rationale.
    - Clinically-calibrated veterinary rule fallback mechanism ensuring zero inference failures.
    - Human-in-the-loop governance: **"AI-assisted, vet-verified"**.
@@ -53,29 +55,38 @@
 ## 🚀 Quick Start Guide
 
 ### 1. Prerequisites
-- **Python** (v3.10+ / v3.12+ / v3.14+)
-- **Node.js** (v18+ or v20+)
+- **Node.js** (v18+ or v20+ / v22+)
 - **npm** (v9+)
 
-### 2. Run Python + FastAPI Backend
+### 2. Run Both Server & Client Concurrently (Single Command)
 ```bash
-# In the project directory:
-cd backend
-pip install -r requirements.txt
-python run.py
+# In the root project directory:
+npm install
+npm run dev
 ```
-*The FastAPI backend will automatically initialize the database, seed demo cluster cases, train the Scikit-Learn Random Forest model, and start running on `http://localhost:5000`.*  
-*Interactive Swagger API documentation is available at `http://localhost:5000/docs`.*
+*This starts:*
+- **Backend (Node.js + Express)** on `http://localhost:5000` (auto-migrates database, seeds initial outbreak cluster, trains AI Random Forest model).
+- **Frontend (React + Vite)** on `http://localhost:5173`.
 
-### 3. Run React Frontend (New Terminal)
+---
+
+### 3. Or Run Separately in Individual Terminals:
+
+**Terminal 1 (Backend - Node.js Express)**:
+```bash
+cd server
+npm install
+npm run dev
+```
+
+**Terminal 2 (Frontend - React + Vite)**:
 ```bash
 cd client
 npm install
 npm run dev
 ```
-*The frontend will launch on `http://localhost:5173`, automatically connected through Vite proxy to the FastAPI backend.*
 
-*(Optional: Dual Node.js Express backend is also preserved in `server/` for full backwards compatibility).*
+*(Optional: If you wish to use the Python FastAPI backend instead, run `cd backend && python run.py` — it also binds to port 5000).*
 
 ---
 

@@ -48,8 +48,8 @@ function extractFeatures(data) {
   const speciesKey = (data.species || 'cow').toLowerCase();
   const speciesCode = SPECIES_MAP[speciesKey] !== undefined ? SPECIES_MAP[speciesKey] : 0;
 
-  // 13: Age
-  const age = parseFloat(data.age) || 2.0;
+  // 13: Age (whole years)
+  const age = parseInt(data.age) || 3;
 
   // 14: Vaccination status
   const vaccKey = data.vaccination_status || 'Vaccinated';

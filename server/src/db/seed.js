@@ -72,7 +72,7 @@ async function seed() {
     user_id: fId,
     name_or_tag: '0036',
     species: 'cow',
-    age: 21.0,
+    age: 3,
     sex: 'female',
     breed: 'Sahiwal Indigenous',
     vaccination_status: 'Vaccinated'
@@ -82,7 +82,7 @@ async function seed() {
     user_id: fId,
     name_or_tag: 'B-204',
     species: 'buffalo',
-    age: 5.5,
+    age: 5,
     sex: 'female',
     breed: 'Murrah',
     vaccination_status: 'Vaccinated'
@@ -92,7 +92,7 @@ async function seed() {
     user_id: fId,
     name_or_tag: 'G-102',
     species: 'goat',
-    age: 3.0,
+    age: 3,
     sex: 'male',
     breed: 'Beetal',
     vaccination_status: 'Vaccinated'
@@ -102,7 +102,7 @@ async function seed() {
     user_id: fId,
     name_or_tag: 'C-412',
     species: 'cow',
-    age: 4.0,
+    age: 4,
     sex: 'female',
     breed: 'Holstein Friesian Cross',
     vaccination_status: 'Partially Vaccinated'
@@ -112,7 +112,7 @@ async function seed() {
     user_id: f2Id,
     name_or_tag: 'S-089',
     species: 'sheep',
-    age: 2.0,
+    age: 2,
     sex: 'female',
     breed: 'Lohi',
     vaccination_status: 'Unvaccinated'
@@ -132,7 +132,7 @@ async function seed() {
     user_id: fId,
     animal_id: a36Id,
     species: 'cow',
-    age: 21.0,
+    age: 3,
     symptoms: JSON.stringify(['fever', 'difficulty_walking', 'salivation']),
     duration_days: 2,
     vaccination_status: 'Vaccinated',
@@ -164,12 +164,12 @@ async function seed() {
 
   // 6 additional HIGH-RISK cases in the cluster (Total High in cluster = 7)
   const highRiskTemplates = [
-    { num: 'Case #0012', species: 'buffalo', age: 6.0, sym: ['fever', 'salivation', 'swelling'], days: 3, vacc: 'Unvaccinated', notes: 'Submandibular swelling and severe salivation.' },
-    { num: 'Case #0019', species: 'cow', age: 4.5, sym: ['fever', 'difficulty_walking', 'skin_lesions'], days: 2, vacc: 'Partially Vaccinated', notes: 'Vesicular lesions observed on interdigital pouch and dental pad.' },
-    { num: 'Case #0023', species: 'cow', age: 5.0, sym: ['fever', 'coughing', 'nasal_discharge'], days: 4, vacc: 'Unvaccinated', notes: 'Rapid laboured breathing with mucoid nasal discharge.' },
-    { num: 'Case #0029', species: 'buffalo', age: 7.0, sym: ['fever', 'salivation', 'lameness'], days: 2, vacc: 'Vaccinated', notes: 'Refusing feed, excessive drooling, hind limb stiffness.' },
-    { num: 'Case #0031', species: 'goat', age: 2.0, sym: ['fever', 'diarrhea', 'nasal_discharge'], days: 3, vacc: 'Unvaccinated', notes: 'Suspected PPR syndrome; high mortality in local goat pen.' },
-    { num: 'Case #0034', species: 'cow', age: 3.5, sym: ['fever', 'difficulty_walking', 'salivation'], days: 1, vacc: 'Partially Vaccinated', notes: 'Acute shivering, foam at mouth, unable to walk to shed.' },
+    { num: 'Case #0012', species: 'buffalo', age: 6, sym: ['fever', 'salivation', 'swelling'], days: 3, vacc: 'Unvaccinated', notes: 'Submandibular swelling and severe salivation.' },
+    { num: 'Case #0019', species: 'cow', age: 4, sym: ['fever', 'difficulty_walking', 'skin_lesions'], days: 2, vacc: 'Partially Vaccinated', notes: 'Vesicular lesions observed on interdigital pouch and dental pad.' },
+    { num: 'Case #0023', species: 'cow', age: 4, sym: ['fever', 'coughing', 'nasal_discharge'], days: 4, vacc: 'Unvaccinated', notes: 'Rapid laboured breathing with mucoid nasal discharge.' },
+    { num: 'Case #0029', species: 'buffalo', age: 6, sym: ['fever', 'salivation', 'lameness'], days: 2, vacc: 'Vaccinated', notes: 'Refusing feed, excessive drooling, hind limb stiffness.' },
+    { num: 'Case #0031', species: 'goat', age: 2, sym: ['fever', 'diarrhea', 'nasal_discharge'], days: 3, vacc: 'Unvaccinated', notes: 'Suspected PPR syndrome; high mortality in local goat pen.' },
+    { num: 'Case #0034', species: 'cow', age: 3, sym: ['fever', 'difficulty_walking', 'salivation'], days: 1, vacc: 'Partially Vaccinated', notes: 'Acute shivering, foam at mouth, unable to walk to shed.' },
   ];
 
   highRiskTemplates.forEach((t, i) => {
@@ -223,7 +223,7 @@ async function seed() {
       report_number: caseNum,
       user_id: i % 3 === 0 ? fId : f2Id,
       species,
-      age: 2.0 + (i % 8),
+      age: 2 + (i % 6),
       symptoms: JSON.stringify(sym),
       duration_days: 1 + (i % 3),
       vaccination_status: i % 2 === 0 ? 'Vaccinated' : 'Partially Vaccinated',
@@ -270,7 +270,7 @@ async function seed() {
       report_number: sr.num,
       user_id: fId,
       species: sr.sp,
-      age: 3.5,
+      age: 3,
       symptoms: JSON.stringify(sr.sym),
       duration_days: 2,
       vaccination_status: 'Vaccinated',

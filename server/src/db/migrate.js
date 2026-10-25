@@ -27,7 +27,7 @@ async function migrate() {
       table.integer('user_id').references('id').inTable('users').onDelete('CASCADE');
       table.string('name_or_tag').notNullable();
       table.string('species').notNullable(); // cow, buffalo, goat, sheep, pig, poultry
-      table.float('age').defaultTo(2.0);
+      table.integer('age').defaultTo(3);
       table.string('sex').defaultTo('female');
       table.string('breed').nullable();
       table.string('vaccination_status').defaultTo('Vaccinated'); // Vaccinated, Unvaccinated, Partially Vaccinated
@@ -44,7 +44,7 @@ async function migrate() {
       table.integer('user_id').references('id').inTable('users').onDelete('SET NULL').nullable();
       table.integer('animal_id').references('id').inTable('animals').onDelete('SET NULL').nullable();
       table.string('species').notNullable();
-      table.float('age').defaultTo(2.0);
+      table.integer('age').defaultTo(3);
       table.text('symptoms').notNullable(); // JSON array string
       table.integer('duration_days').defaultTo(1);
       table.string('vaccination_status').defaultTo('Vaccinated');
