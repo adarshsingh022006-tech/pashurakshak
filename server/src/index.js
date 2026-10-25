@@ -15,6 +15,8 @@ const notificationRoutes = require('./routes/notifications');
 const weatherRoutes = require('./routes/weather');
 const analyticsRoutes = require('./routes/analytics');
 const voiceRoutes = require('./routes/voice');
+const vetsRoutes = require('./routes/vets');
+const ambulanceRoutes = require('./routes/ambulance');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,6 +38,8 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/voice', voiceRoutes);
+app.use('/api/vets', vetsRoutes);
+app.use('/api/ambulance', ambulanceRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -19,6 +19,8 @@ import VetPriorityQueue from './pages/VetPriorityQueue';
 import VetManageCases from './pages/VetManageCases';
 import VetScheduleVisits from './pages/VetScheduleVisits';
 import AuthorityDashboard from './pages/AuthorityDashboard';
+import NearbyVetsPage from './pages/NearbyVetsPage';
+import AmbulanceTrackerPage from './pages/AmbulanceTrackerPage';
 
 // Route Guard component
 function ProtectedRoute({ children, allowedRoles }) {
@@ -115,6 +117,22 @@ export default function App() {
                   element={
                     <ProtectedRoute>
                       <AlertsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/nearby-vets"
+                  element={
+                    <ProtectedRoute>
+                      <NearbyVetsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/ambulance"
+                  element={
+                    <ProtectedRoute>
+                      <AmbulanceTrackerPage />
                     </ProtectedRoute>
                   }
                 />

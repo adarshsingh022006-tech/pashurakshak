@@ -221,6 +221,51 @@ export default function FarmerDashboard() {
         </div>
       </div>
 
+      {/* Quick Services: Nearby Vets & 1962 Ambulance */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Nearby Vets Card */}
+        <Link
+          to="/nearby-vets"
+          className="group p-5 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between"
+        >
+          <div className="space-y-1">
+            <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-wider">
+              Instant Tele-Consult
+            </span>
+            <h3 className="text-base font-black group-hover:translate-x-0.5 transition-transform">
+              Nearby Verified Veterinarians &rarr;
+            </h3>
+            <p className="text-xs text-emerald-100 max-w-sm">
+              Connect with 5 local doctors via phone or video call. Transparent rates from ₹0 (Govt.) to ₹199.
+            </p>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
+            🩺
+          </div>
+        </Link>
+
+        {/* 1962 Ambulance Card */}
+        <Link
+          to="/ambulance"
+          className="group p-5 rounded-2xl bg-gradient-to-br from-red-600 to-rose-800 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between"
+        >
+          <div className="space-y-1">
+            <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-wider">
+              Emergency 24x7
+            </span>
+            <h3 className="text-base font-black group-hover:translate-x-0.5 transition-transform">
+              1962 Pashu Ambulance (MVU) &rarr;
+            </h3>
+            <p className="text-xs text-rose-100 max-w-sm">
+              Dispatch government mobile hospital van to your farm with oxygen, surgical kit, and emergency medicine.
+            </p>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
+            🚑
+          </div>
+        </Link>
+      </div>
+
       {/* Recent Reports Table */}
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
         <div className="p-5 border-b border-slate-100 flex items-center justify-between">

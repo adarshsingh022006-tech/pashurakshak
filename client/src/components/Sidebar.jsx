@@ -14,7 +14,9 @@ import {
   Skull,
   UserPlus,
   Home,
-  CheckCircle2
+  CheckCircle2,
+  Phone,
+  Truck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
@@ -124,6 +126,22 @@ export default function Sidebar({ isOpen, onClose }) {
                   )}
                 </div>
                 <span>{t.alerts}</span>
+              </NavLink>
+
+              <NavLink to="/nearby-vets" className={navItemClass} onClick={onClose}>
+                <Phone size={18} className="text-emerald-600" />
+                <span className="flex items-center gap-1.5">
+                  <span>Nearby Doctors</span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">Call/Video</span>
+                </span>
+              </NavLink>
+
+              <NavLink to="/ambulance" className={navItemClass} onClick={onClose}>
+                <Truck size={18} className="text-red-600" />
+                <span className="flex items-center gap-1.5">
+                  <span>1962 Ambulance</span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-800 font-bold">Live GPS</span>
+                </span>
               </NavLink>
             </nav>
           </div>

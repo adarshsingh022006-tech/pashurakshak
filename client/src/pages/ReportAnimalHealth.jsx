@@ -14,12 +14,20 @@ import {
   ShieldAlert,
   Search,
   Stethoscope,
-  Copy
+  Copy,
+  Phone,
+  PhoneCall,
+  Video,
+  Truck
 } from 'lucide-react';
 import api from '../services/api';
 import VoiceRecorder from '../components/VoiceRecorder';
 import { useOffline } from '../context/OfflineContext';
 import { useAuth } from '../context/AuthContext';
+import { NEARBY_VETS } from '../data/nearbyVetsData';
+import VoiceCallModal from '../components/VoiceCallModal';
+import VideoCallModal from '../components/VideoCallModal';
+import AmbulanceTrackerModal from '../components/AmbulanceTrackerModal';
 
 const SYMPTOMS_OPTIONS = [
   { id: 'fever', label: 'Fever (Bukhar)', desc: 'High body temperature' },
@@ -60,6 +68,9 @@ export default function ReportAnimalHealth() {
   const [aiResult, setAiResult] = useState(null);
   const [successModalData, setSuccessModalData] = useState(null);
   const [error, setError] = useState('');
+  const [activeVoiceVet, setActiveVoiceVet] = useState(null);
+  const [activeVideoVet, setActiveVideoVet] = useState(null);
+  const [isAmbulanceOpen, setIsAmbulanceOpen] = useState(false);
 
   useEffect(() => {
     // Load registered animals
@@ -227,16 +238,16 @@ export default function ReportAnimalHealth() {
       {/* SUCCESS & TRACKING MODAL POPUP */}
       {successModalData && (
         <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border-2 border-emerald-500 space-y-5 relative animate-scale-up">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border-2 border-emerald-500 space-y-4 relative animate-scale-up max-h-[92vh] overflow-y-auto">
             {/* Status Header */}
-            <div className="text-center space-y-2">
-              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
-                <CheckCircle2 size={38} className="text-emerald-600 stroke-[2.5]" />
+            <div className="text-center space-y-1.5">
+              <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <CheckCircle2 size={34} className="text-emerald-600 stroke-[2.5]" />
               </div>
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 uppercase tracking-wider">
+              <span className="inline-block px-3 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 uppercase tracking-wider">
                 ✓ Reported Successfully
               </span>
-              <h2 className="text-2xl font-black text-slate-900">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
                 रिपोर्ट सफलतापूर्वक दर्ज हो गई!
               </h2>
               <p className="text-xs text-slate-600">
@@ -245,14 +256,14 @@ export default function ReportAnimalHealth() {
             </div>
 
             {/* Official Report ID / Tracking Code */}
-            <div className="bg-slate-50 border-2 border-dashed border-emerald-300 rounded-2xl p-4 text-center space-y-1">
+            <div className="bg-slate-50 border-2 border-dashed border-emerald-300 rounded-2xl p-3.5 text-center space-y-1">
               <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Official Tracking Case ID
               </div>
-              <div className="text-3xl font-black font-mono text-navy tracking-tight flex items-center justify-center gap-2">
+              <div className="text-2xl sm:text-3xl font-black font-mono text-navy tracking-tight flex items-center justify-center gap-2">
                 <span>{successModalData.report_number}</span>
               </div>
-              <div className="text-xs text-slate-500 flex items-center justify-center gap-2 pt-1 font-medium">
+              <div className="text-xs text-slate-500 flex items-center justify-center gap-2 pt-0.5 font-medium">
                 <span>Species: <strong className="text-slate-800 capitalize">{successModalData.species}</strong></span>
                 <span>•</span>
                 <span>Location: <strong className="text-slate-800">{successModalData.village}</strong></span>
@@ -260,13 +271,13 @@ export default function ReportAnimalHealth() {
             </div>
 
             {/* AI Risk Assessment Card */}
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                  <Sparkles size={15} className="text-amber-500" />
+                  <Sparkles size={14} className="text-amber-500" />
                   AI Risk Classification:
                 </span>
-                <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase ${
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
                   successModalData.risk_level === 'High' ? 'bg-red-100 text-red-800 border border-red-300' :
                   successModalData.risk_level === 'Medium' ? 'bg-amber-100 text-amber-800 border border-amber-300' :
                   'bg-green-100 text-green-800 border border-green-300'
@@ -274,21 +285,102 @@ export default function ReportAnimalHealth() {
                   {successModalData.risk_level || 'High'} Risk ({Math.round((successModalData.ai_confidence || 0.94) * 100)}% Confidence)
                 </span>
               </div>
-              <p className="text-slate-700 leading-relaxed font-medium">
+              <p className="text-slate-700 leading-relaxed font-medium text-[11px]">
                 {successModalData.ai_reason}
               </p>
             </div>
 
+            {/* 1962 Pashu Ambulance Card (Especially for High Risk) */}
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 text-white flex items-center justify-between shadow-md">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-2xl shrink-0">🚑</span>
+                <div className="min-w-0">
+                  <strong className="block text-xs font-black truncate">1962 Pashu Ambulance (Free Govt. MVU)</strong>
+                  <span className="text-[10px] text-rose-100 block truncate">
+                    Emergency on-site hospital van with surgical kit & oxygen
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAmbulanceOpen(true)}
+                className="px-3 py-1.5 rounded-xl bg-white text-red-700 font-black text-xs hover:bg-rose-50 transition-colors shadow-sm shrink-0 active:scale-95 cursor-pointer"
+              >
+                Track 1962 Van
+              </button>
+            </div>
+
+            {/* Nearby 4-5 Doctors with Voice & Video Call Rates */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-800">
+                <span className="flex items-center gap-1.5">
+                  <PhoneCall size={14} className="text-emerald-600" />
+                  Nearby Vets (तुरंत डॉक्टर से बात करें):
+                </span>
+                <span className="text-[10px] text-slate-400 font-normal">Direct Voice / Video Call</span>
+              </div>
+
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                {NEARBY_VETS.map(vet => (
+                  <div
+                    key={vet.id}
+                    className="p-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/90 flex items-center justify-between gap-2 text-xs hover:border-emerald-300 transition-colors"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="relative shrink-0">
+                        <img
+                          src={vet.avatar}
+                          alt={vet.name}
+                          className="w-9 h-9 rounded-full object-cover border border-slate-200"
+                        />
+                        <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-white ${
+                          vet.isOnline ? 'bg-emerald-500' : 'bg-amber-500'
+                        }`} />
+                      </div>
+                      <div className="min-w-0">
+                        <strong className="block text-navy text-[12px] truncate">{vet.name}</strong>
+                        <span className="text-[10px] text-slate-500 block truncate">
+                          {vet.clinic} • <span className="font-semibold text-slate-700">{vet.distanceKm} km</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setActiveVoiceVet(vet)}
+                        className="px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-[11px] font-bold text-slate-800 flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
+                        title="Voice Call Doctor"
+                      >
+                        <Phone size={11} className="text-emerald-600" />
+                        <span>{vet.charges.voiceCall === 0 ? 'Free' : `₹${vet.charges.voiceCall}`}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setActiveVideoVet(vet)}
+                        className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-[11px] font-bold text-white flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
+                        title="Video Consultation"
+                      >
+                        <Video size={11} />
+                        <span>{vet.charges.videoCall === 0 ? 'Free' : `₹${vet.charges.videoCall}`}</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Action Buttons: Track Case vs Doctor Queue */}
-            <div className="space-y-2 pt-2">
+            <div className="space-y-2 pt-2 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => navigate(`/case/${successModalData.id}`)}
-                className="w-full py-3.5 px-4 rounded-xl bg-navy hover:bg-navy-dark text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3 px-4 rounded-xl bg-navy hover:bg-navy-dark text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Search size={16} />
-                <span>Track This Case (Status & Treatment)</span>
-                <ArrowRight size={16} />
+                <Search size={15} />
+                <span>Track This Case Details (Status & Treatment)</span>
+                <ArrowRight size={15} />
               </button>
 
               <button
@@ -308,7 +400,7 @@ export default function ReportAnimalHealth() {
                   setFreeTextNotes('');
                   setPhotoPreview(null);
                 }}
-                className="w-full text-center py-2 text-xs text-slate-500 hover:text-slate-700 font-medium cursor-pointer"
+                className="w-full text-center py-1.5 text-xs text-slate-500 hover:text-slate-700 font-medium cursor-pointer"
               >
                 ✕ Close & File Another Report
               </button>
@@ -316,6 +408,36 @@ export default function ReportAnimalHealth() {
           </div>
         </div>
       )}
+
+      {/* Voice Call Modal */}
+      {activeVoiceVet && (
+        <VoiceCallModal
+          vet={activeVoiceVet}
+          caseNumber={successModalData?.report_number}
+          animalDetails={{ species: successModalData?.species, age: successModalData?.age }}
+          onClose={() => setActiveVoiceVet(null)}
+        />
+      )}
+
+      {/* Video Call Modal */}
+      {activeVideoVet && (
+        <VideoCallModal
+          vet={activeVideoVet}
+          caseNumber={successModalData?.report_number}
+          animalDetails={{ species: successModalData?.species, age: successModalData?.age }}
+          onClose={() => setActiveVideoVet(null)}
+        />
+      )}
+
+      {/* Ambulance Tracker Modal */}
+      {isAmbulanceOpen && (
+        <AmbulanceTrackerModal
+          caseNumber={successModalData?.report_number}
+          village={successModalData?.village || 'Samrala'}
+          onClose={() => setIsAmbulanceOpen(false)}
+        />
+      )}
+
       {/* Title */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-black text-navy-dark">

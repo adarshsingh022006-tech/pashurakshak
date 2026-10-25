@@ -66,6 +66,15 @@ export default function Navbar({ onMenuToggle }) {
           {/* Weather Chip */}
           <WeatherChip />
 
+          {/* Quick 1962 Ambulance Hotline Pill */}
+          <Link
+            to="/ambulance"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 text-xs font-bold hover:bg-red-100 transition-colors shadow-2xs"
+            title="1962 Pashu Ambulance Tracker"
+          >
+            <span>🚑 1962 Ambulance</span>
+          </Link>
+
           {/* Offline / Pending Sync indicators */}
           {!isOnline && (
             <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">

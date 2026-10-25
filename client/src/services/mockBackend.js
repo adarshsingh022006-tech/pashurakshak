@@ -1,5 +1,6 @@
 // Client-Side Mock Backend & Data Engine for Standalone Cloud & Offline Deployment
 // Provides persistent state in localStorage and exact clinical AI risk scoring
+import { NEARBY_VETS, MOBILE_VET_UNITS } from '../data/nearbyVetsData';
 
 const STORAGE_KEY = 'pashurakshak_cloud_state_v5';
 
@@ -819,6 +820,22 @@ export async function handleMockRequest(config) {
   if (url.includes('/voice/parse') && method === 'post') {
     const parsed = parseVoiceTranscript(data.transcript || '');
     return { data: parsed };
+  }
+
+  // 24. Vets: Nearby Directory & Tele-Consultation
+  if (url.includes('/vets')) {
+    return { data: { vets: NEARBY_VETS } };
+  }
+
+  // 25. Ambulance: 1962 Mobile Veterinary Unit Dispatch & Tracking
+  if (url.includes('/ambulance')) {
+    return {
+      data: {
+        success: true,
+        unit: MOBILE_VET_UNITS[0],
+        message: '1962 Mobile Veterinary Unit dispatched successfully!'
+      }
+    };
   }
 
   // Fallback default response

@@ -12,11 +12,19 @@ import {
   ShieldAlert,
   CloudSun,
   User,
-  Plus
+  Plus,
+  Phone,
+  PhoneCall,
+  Video,
+  Truck
 } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import CaseLifecycleStepper from '../components/CaseLifecycleStepper';
+import { NEARBY_VETS } from '../data/nearbyVetsData';
+import VoiceCallModal from '../components/VoiceCallModal';
+import VideoCallModal from '../components/VideoCallModal';
+import AmbulanceTrackerModal from '../components/AmbulanceTrackerModal';
 
 export default function CaseDetail() {
   const { id } = useParams();
@@ -30,6 +38,9 @@ export default function CaseDetail() {
   // Vet action form states
   const [showTreatmentModal, setShowTreatmentModal] = useState(false);
   const [showVisitModal, setShowVisitModal] = useState(false);
+  const [activeVoiceVet, setActiveVoiceVet] = useState(null);
+  const [activeVideoVet, setActiveVideoVet] = useState(null);
+  const [isAmbulanceOpen, setIsAmbulanceOpen] = useState(false);
   const [treatmentForm, setTreatmentForm] = useState({
     diagnosis: '',
     prescribed_medicines: '',
@@ -346,6 +357,68 @@ export default function CaseDetail() {
         </p>
       </div>
 
+      {/* Emergency Veterinary Tele-Consultation & 1962 Ambulance Section */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <div>
+            <h3 className="text-sm font-bold text-navy flex items-center gap-2">
+              <PhoneCall size={16} className="text-emerald-600" />
+              <span>Direct Tele-Consultation with Nearby Doctors (तुरंत डॉक्टर से परामर्श लें)</span>
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Need immediate clinical advice for Case {report.report_number}? Connect instantly via voice or video call.
+            </p>
+          </div>
+
+          {/* 1962 Ambulance Dispatch Button */}
+          <button
+            type="button"
+            onClick={() => setIsAmbulanceOpen(true)}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-95 shrink-0 cursor-pointer"
+          >
+            <Truck size={15} />
+            <span>🚑 Track 1962 Pashu Ambulance</span>
+          </button>
+        </div>
+
+        {/* Nearby Doctors Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {NEARBY_VETS.slice(0, 3).map(vet => (
+            <div key={vet.id} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2 flex flex-col justify-between">
+              <div className="flex items-center gap-2.5">
+                <img src={vet.avatar} alt={vet.name} className="w-10 h-10 rounded-full object-cover border" />
+                <div className="min-w-0">
+                  <strong className="block text-xs text-navy font-bold truncate">{vet.name}</strong>
+                  <span className="text-[11px] text-slate-500 block truncate">{vet.clinic} • {vet.distanceKm} km</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] bg-white p-2 rounded-lg border border-slate-200/80">
+                <span className="text-slate-600 font-medium">Voice: {vet.charges.voiceCall === 0 ? 'FREE' : `₹${vet.charges.voiceCall}`}</span>
+                <span className="text-teal-700 font-bold">Video: {vet.charges.videoCall === 0 ? 'FREE' : `₹${vet.charges.videoCall}`}</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveVoiceVet(vet)}
+                  className="py-1.5 px-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 font-bold text-[11px] text-slate-700 flex items-center justify-center gap-1 shadow-2xs transition-colors cursor-pointer"
+                >
+                  <Phone size={12} className="text-emerald-600" /> Call
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveVideoVet(vet)}
+                  className="py-1.5 px-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center justify-center gap-1 shadow-2xs transition-colors cursor-pointer"
+                >
+                  <Video size={12} /> Video Call
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Vet Actions Panel (Visits and Treatments) */}
       <div className="bg-slate-50 rounded-2xl border border-slate-200/90 p-6 shadow-xs space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-3">
@@ -570,6 +643,35 @@ export default function CaseDetail() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Voice Call Modal */}
+      {activeVoiceVet && (
+        <VoiceCallModal
+          vet={activeVoiceVet}
+          caseNumber={report.report_number}
+          animalDetails={{ species: report.species, age: report.age }}
+          onClose={() => setActiveVoiceVet(null)}
+        />
+      )}
+
+      {/* Video Call Modal */}
+      {activeVideoVet && (
+        <VideoCallModal
+          vet={activeVideoVet}
+          caseNumber={report.report_number}
+          animalDetails={{ species: report.species, age: report.age }}
+          onClose={() => setActiveVideoVet(null)}
+        />
+      )}
+
+      {/* Ambulance Tracker Modal */}
+      {isAmbulanceOpen && (
+        <AmbulanceTrackerModal
+          caseNumber={report.report_number}
+          village={report.village || 'Samrala'}
+          onClose={() => setIsAmbulanceOpen(false)}
+        />
       )}
     </div>
   );
