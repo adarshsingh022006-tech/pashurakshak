@@ -22,8 +22,6 @@
 | **Environmental Data** | **OpenWeatherMap** | Live micro-climate temperature & humidity risk integration |
 | **Voice Processing** | **Speech-to-Text API** | Multilingual browser Web Speech API + backend symptom NLP parser (Hindi, Punjabi, English) |
 
-*(Note: An alternative Python FastAPI backend is also preserved in `backend/` for Python/Scikit-Learn environments).*
-
 ---
 
 ## 🌟 The PashuRakshak Intelligence Loop
@@ -86,8 +84,6 @@ npm install
 npm run dev
 ```
 
-*(Optional: If you wish to use the Python FastAPI backend instead, run `cd backend && python run.py` — it also binds to port 5000).*
-
 ---
 
 ## 🔐 Demo Credentials
@@ -134,12 +130,12 @@ All test accounts use the password: `Demo@123`
 
 ---
 
-## 📡 Key REST API Endpoints (FastAPI)
+## 📡 Key REST API Endpoints (Express.js)
 
 - `POST /api/auth/login` — JWT authentication
 - `POST /api/auth/register` — Role-based registration
 - `GET /api/reports` — Filtered community health reports (supports `days=3`)
-- `POST /api/reports` — Submit report (triggers Scikit-Learn Random Forest risk classifier)
+- `POST /api/reports` — Submit report (triggers Random Forest risk classifier)
 - `GET /api/reports/{id}` — Full case details (with treatments, visits, weather)
 - `PATCH /api/reports/{id}/status` — Status transition (New → Under Review → Visit Scheduled → In Treatment → Resolved)
 - `PATCH /api/reports/{id}/verify` — Licensed veterinarian verification
